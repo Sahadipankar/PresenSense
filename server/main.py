@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from routes import admin, match
+from routes import admin, match, emotion
 import uvicorn
 from db import init_db
 from pathlib import Path
@@ -10,6 +10,7 @@ import os
 import logging
 from fastapi import HTTPException
 from models.face_recognition import preload_models
+from models.emotion_detection import preload_emotion_models
 
 # Configure logging for Cloud Run
 logging.basicConfig(
@@ -51,6 +52,10 @@ async def startup_event():
         preload_models()
         logger.info("Face model preloaded")
         
+        # Preload emotion detection models
+        preload_emotion_models()
+        logger.info("Emotion detection models preloaded")
+        
     except Exception as e:
         logger.error(f"Startup error: {e}")
         raise
@@ -84,6 +89,7 @@ app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 # Include routes
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(match.router, prefix="/match", tags=["Match"])
+app.include_router(emotion.router, prefix="/emotion", tags=["Emotion"])
 
 @app.get("/", response_class=HTMLResponse)
 def root():

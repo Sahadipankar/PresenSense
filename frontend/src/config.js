@@ -6,10 +6,19 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 
 // API Endpoints
 export const API_ENDPOINTS = {
+    BASE_URL: API_BASE_URL,
     UPLOAD: `${API_BASE_URL}/admin/upload`,
     ATTENDANCE: `${API_BASE_URL}/admin/attendance`,
     MATCH: `${API_BASE_URL}/match/`,
+    MATCH_WITH_EMOTION: `${API_BASE_URL}/match/with-emotion`,
     STREAM: `${API_BASE_URL}/match/stream`,
+    EMOTION: {
+        START_SESSION: `${API_BASE_URL}/emotion/start-session`,
+        END_SESSION: `${API_BASE_URL}/emotion/end-session`,
+        ANALYZE_FRAME: `${API_BASE_URL}/emotion/analyze-frame`,
+        SESSION_STATS: `${API_BASE_URL}/emotion/session`,
+        SESSIONS: `${API_BASE_URL}/emotion/sessions`
+    },
     HEALTH: `${API_BASE_URL}/health`,
     READY: `${API_BASE_URL}/ready`
 }

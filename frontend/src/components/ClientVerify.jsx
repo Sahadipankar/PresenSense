@@ -6,13 +6,24 @@ export default function ClientVerify() {
     const [ok, setOk] = useState(false)
     const videoRef = useRef(null)
     const canvasRef = useRef(null)
+    const overlayCanvasRef = useRef(null)
     const [streaming, setStreaming] = useState(false)
     const timerRef = useRef(null)
     const [live, setLive] = useState(false)
     const [facing, setFacing] = useState('user') // 'user' | 'environment'
-    // Mirror is always enabled by default
     const [fullscreen, setFullscreen] = useState(false)
     const containerRef = useRef(null)
+
+    // Emotion detection state
+    const [emotionActive, setEmotionActive] = useState(false)
+    const [currentEmotion, setCurrentEmotion] = useState(null)
+    const [isLookingAtCamera, setIsLookingAtCamera] = useState(false)
+    const [faceBbox, setFaceBbox] = useState(null)
+    const [attentionStats, setAttentionStats] = useState({
+        totalFrames: 0,
+        attentionFrames: 0,
+        attentionPercentage: 0
+    })
 
     const startWithFacing = async (targetFacing) => {
         try {
@@ -98,6 +109,54 @@ export default function ClientVerify() {
         try { await startWithFacing(next) } catch { }
     }
 
+    // Emotion detection helper functions
+    const drawEmotionOverlay = (ctx, analysis, canvasWidth, canvasHeight) => {
+        if (!analysis?.face_bbox) return
+
+        const { face_bbox, emotion, gaze } = analysis
+
+        // Calculate mirrored coordinates for display
+        const mirroredX = canvasWidth - (face_bbox.x + face_bbox.width)
+
+        // Draw face bounding box
+        ctx.save()
+        ctx.scale(-1, 1)
+        ctx.strokeStyle = gaze.is_looking_at_camera ? '#00ff00' : '#ff6600'
+        ctx.lineWidth = 3
+        // Since canvas is mirrored, draw at negative X
+        ctx.strokeRect(-mirroredX - face_bbox.width, face_bbox.y, face_bbox.width, face_bbox.height)
+
+        // Draw emotion and attention info (mirrored)
+        ctx.fillStyle = gaze.is_looking_at_camera ? '#00ff00' : '#ff6600'
+        ctx.font = '16px Arial'
+        ctx.textAlign = 'left'
+        ctx.fillText(
+            `${emotion.dominant_emotion} (${(emotion.confidence * 100).toFixed(1)}%)`,
+            -mirroredX - face_bbox.width,
+            face_bbox.y - 10
+        )
+
+        // Draw attention status
+        ctx.fillText(
+            gaze.is_looking_at_camera ? '👁 Looking at camera' : '👁 Not focused',
+            -mirroredX - face_bbox.width,
+            face_bbox.y + face_bbox.height + 20
+        )
+        ctx.restore()
+    }
+
+    const updateAttentionStats = (isLooking) => {
+        setAttentionStats(prev => {
+            const newTotalFrames = prev.totalFrames + 1
+            const newAttentionFrames = prev.attentionFrames + (isLooking ? 1 : 0)
+            return {
+                totalFrames: newTotalFrames,
+                attentionFrames: newAttentionFrames,
+                attentionPercentage: (newAttentionFrames / newTotalFrames) * 100
+            }
+        })
+    }
+
     const verify = async () => {
         if (!streaming) {
             await start({ fullscreen: true })
@@ -106,12 +165,25 @@ export default function ClientVerify() {
         }
         const video = videoRef.current
         const canvas = canvasRef.current
+        const overlayCanvas = overlayCanvasRef.current
+
         // Sync canvas size to actual video stream dimensions for best quality
         if (video.videoWidth && video.videoHeight) {
             canvas.width = video.videoWidth
             canvas.height = video.videoHeight
+            if (overlayCanvas) {
+                overlayCanvas.width = video.videoWidth
+                overlayCanvas.height = video.videoHeight
+            }
         }
+
         const ctx = canvas.getContext('2d')
+        const overlayCtx = overlayCanvas ? overlayCanvas.getContext('2d') : null
+
+        // Clear overlay
+        if (overlayCtx) {
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height)
+        }
 
         // Always apply mirror effect
         ctx.save()
@@ -123,14 +195,37 @@ export default function ClientVerify() {
         canvas.toBlob(async (blob) => {
             const fd = new FormData()
             fd.append('file', blob, 'verify.jpg')
-            setMsg('Verifying...'); setOk(false)
+            setMsg('Verifying with emotion detection...'); setOk(false)
+
             try {
-                const res = await fetch(API_ENDPOINTS.MATCH, { method: 'POST', body: fd })
+                const res = await fetch(API_ENDPOINTS.MATCH_WITH_EMOTION, { method: 'POST', body: fd })
                 const data = await res.json()
-                if (!res.ok) throw new Error(data.detail || 'No match')
-                setMsg(`Attendance marked! Welcome, ${data.user_id}`); setOk(true)
+
+                if (!res.ok) throw new Error(data.detail || 'Verification failed')
+
+                const faceRecognition = data.face_recognition
+                const emotionDetection = data.emotion_detection
+
+                if (faceRecognition.threshold_met) {
+                    setMsg(`Attendance marked! Welcome, User ${faceRecognition.user_id}`)
+                    setOk(true)
+
+                    // Display emotion overlay if successful
+                    if (emotionDetection.success && overlayCtx) {
+                        drawEmotionOverlay(overlayCtx, emotionDetection, canvas.width, canvas.height)
+                        setCurrentEmotion(emotionDetection.emotion)
+                        setIsLookingAtCamera(emotionDetection.gaze.is_looking_at_camera)
+                        setFaceBbox(emotionDetection.face_bbox)
+                    }
+                } else {
+                    const sc = typeof faceRecognition.score === 'number' ?
+                        ` (Confidence: ${(faceRecognition.score * 100).toFixed(1)}%)` : ''
+                    setMsg(`No face match found${sc}`)
+                    setOk(false)
+                }
             } catch (err) {
-                setMsg(String(err)); setOk(false)
+                setMsg(String(err))
+                setOk(false)
             }
         }, 'image/jpeg')
     }
@@ -139,16 +234,39 @@ export default function ClientVerify() {
         if (!streaming) { await start({ fullscreen: true }) }
         else if (!fullscreen) { enterFullscreen() }
         if (timerRef.current) return
+
         setLive(true)
-        const INTERVAL_MS = 2000
+        setEmotionActive(true)
+
+        // Reset attention stats
+        setAttentionStats({
+            totalFrames: 0,
+            attentionFrames: 0,
+            attentionPercentage: 0
+        })
+
+        const INTERVAL_MS = 3000 // 3 seconds for emotion detection
         const tick = async () => {
             const video = videoRef.current
             const canvas = canvasRef.current
+            const overlayCanvas = overlayCanvasRef.current
+
             if (video.videoWidth && video.videoHeight) {
                 canvas.width = video.videoWidth
                 canvas.height = video.videoHeight
+                if (overlayCanvas) {
+                    overlayCanvas.width = video.videoWidth
+                    overlayCanvas.height = video.videoHeight
+                }
             }
+
             const ctx = canvas.getContext('2d')
+            const overlayCtx = overlayCanvas ? overlayCanvas.getContext('2d') : null
+
+            // Clear overlay
+            if (overlayCtx) {
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height)
+            }
 
             // Always apply mirror effect
             ctx.save()
@@ -161,29 +279,59 @@ export default function ClientVerify() {
                 const fd = new FormData()
                 fd.append('file', blob, 'frame.jpg')
                 try {
-                    const res = await fetch(API_ENDPOINTS.STREAM, { method: 'POST', body: fd })
+                    const res = await fetch(API_ENDPOINTS.MATCH_WITH_EMOTION, { method: 'POST', body: fd })
                     const data = await res.json()
-                    if (res.ok && data.user_id) {
-                        setMsg(`Welcome, ${data.user_id}! ${data.created ? '(New attendance)' : '(Already present)'}`); setOk(true)
+
+                    if (res.ok) {
+                        const faceRecognition = data.face_recognition
+                        const emotionDetection = data.emotion_detection
+
+                        if (faceRecognition.threshold_met) {
+                            setMsg(`Welcome, ${faceRecognition.user_name || 'User ' + faceRecognition.user_id}! ${faceRecognition.attendance_created ? '(New attendance)' : '(Already present)'}`)
+                            setOk(true)
+                        } else {
+                            const sc = typeof faceRecognition.score === 'number' ?
+                                ` (Confidence: ${(faceRecognition.score * 100).toFixed(1)}%)` : ''
+                            setMsg(`No face match found${sc}`)
+                            setOk(false)
+                        }
+
+                        // Handle emotion detection overlay
+                        if (emotionDetection.success && overlayCtx) {
+                            drawEmotionOverlay(overlayCtx, emotionDetection, canvas.width, canvas.height)
+                            setCurrentEmotion(emotionDetection.emotion)
+                            const isLooking = emotionDetection.gaze.is_looking_at_camera
+                            setIsLookingAtCamera(isLooking)
+                            setFaceBbox(emotionDetection.face_bbox)
+                            updateAttentionStats(isLooking)
+                        }
                     } else {
-                        const sc = typeof data.score === 'number' ? ` (Confidence: ${(data.score * 100).toFixed(1)}%)` : ''
-                        setMsg(`No face match found${sc}`); setOk(false)
+                        setMsg('Processing...'); setOk(false)
                     }
                 } catch (e) {
-                    setMsg(String(e)); setOk(false)
+                    setMsg('Live verification error: ' + e); setOk(false)
                 }
             }, 'image/jpeg')
         }
+
+        // Start immediate analysis, then repeat every 5 seconds
+        setTimeout(tick, 1000)
         timerRef.current = setInterval(tick, INTERVAL_MS)
-        setMsg('Live verification started'); setOk(true)
+        setMsg('Live verification with emotion tracking started'); setOk(true)
     }
 
     const stopLive = () => {
         if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
         setLive(false)
-        stopCamera();
-        exitFullscreen();
+        setEmotionActive(false)
+        stopCamera()
+        exitFullscreen()
         setMsg('Live verification stopped')
+
+        // Clear emotion state
+        setCurrentEmotion(null)
+        setIsLookingAtCamera(false)
+        setFaceBbox(null)
     }
 
     useEffect(() => () => {
@@ -221,6 +369,12 @@ export default function ClientVerify() {
                                 ref={videoRef}
                                 autoPlay
                                 playsInline
+                                style={fullscreen ? { borderRadius: 0, maxHeight: '100vh', maxWidth: '100vw' } : {}}
+                            />
+                            {/* Emotion Detection Overlay Canvas */}
+                            <canvas
+                                ref={overlayCanvasRef}
+                                className={fullscreen ? `absolute top-0 left-0 w-full h-full object-contain pointer-events-none scale-x-[-1]` : `absolute top-0 left-0 w-full h-full pointer-events-none rounded-2xl scale-x-[-1]`}
                                 style={fullscreen ? { borderRadius: 0, maxHeight: '100vh', maxWidth: '100vw' } : {}}
                             />
                             {/* Status Indicator */}
@@ -341,6 +495,70 @@ export default function ClientVerify() {
                                         )}
                                         <span className="font-medium">{msg}</span>
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Emotion Detection Stats */}
+                            {emotionActive && (currentEmotion || attentionStats.totalFrames > 0) && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    {/* Current Emotion */}
+                                    {currentEmotion && (
+                                        <div className={`p-4 rounded-xl border ${isLookingAtCamera
+                                            ? 'bg-green-500/20 border-green-500/30'
+                                            : 'bg-orange-500/20 border-orange-500/30'
+                                            }`}>
+                                            <h4 className="text-white font-semibold mb-2 flex items-center">
+                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a1.5 1.5 0 011.5 1.5v1a1.5 1.5 0 01-1.5 1.5H9m4.5-5H15a1.5 1.5 0 011.5 1.5v1a1.5 1.5 0 01-1.5 1.5h-1.5m-5-5v5m5-5a1.5 1.5 0 00-1.5-1.5H9a1.5 1.5 0 00-1.5 1.5v5" />
+                                                </svg>
+                                                Current Status
+                                            </h4>
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-white/70">Emotion:</span>
+                                                    <span className="text-white font-medium">
+                                                        {currentEmotion.dominant_emotion} ({(currentEmotion.confidence * 100).toFixed(1)}%)
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-white/70">Eye Contact:</span>
+                                                    <span className={`font-medium ${isLookingAtCamera ? 'text-green-300' : 'text-orange-300'}`}>
+                                                        {isLookingAtCamera ? '✅ Looking at camera' : '⚠️ Not focused'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Attention Statistics */}
+                                    {attentionStats.totalFrames > 0 && (
+                                        <div className="p-4 rounded-xl border bg-blue-500/20 border-blue-500/30">
+                                            <h4 className="text-white font-semibold mb-2 flex items-center">
+                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                                </svg>
+                                                Attention Analytics
+                                            </h4>
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-white/70">Total Frames:</span>
+                                                    <span className="text-white font-medium">{attentionStats.totalFrames}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-white/70">Attention Frames:</span>
+                                                    <span className="text-white font-medium">{attentionStats.attentionFrames}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-white/70">Attention Rate:</span>
+                                                    <span className={`font-medium ${attentionStats.attentionPercentage >= 70 ? 'text-green-300' :
+                                                        attentionStats.attentionPercentage >= 40 ? 'text-yellow-300' : 'text-red-300'
+                                                        }`}>
+                                                        {attentionStats.attentionPercentage.toFixed(1)}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
