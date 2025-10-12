@@ -1,373 +1,1273 @@
+# 🎯 PresenSense - Smart Face Recognition Attendance System
 
-# PresenSense - Emotion-Aware Attendance Tracking System
+![PresenSense Logo](https://img.shields.io/badge/PresenSense-Smart%20Attendance-purple?style=for-the-badge&logo=eye&logoColor=white)
+![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge)
+![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.116.1-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
-PresenSense is an AI-powered system that ensures secure attendance through facial recognition while also tracking emotions, mood, and engagement in real time. It works seamlessly across classes, offices, webinars, and online meetings, providing a smart analytics dashboard for teachers, managers, and HR to monitor presence, attention, and overall participation.
-
-This monorepo contains three main folders: `admin`, `client`, and `server`. Each folder serves a distinct purpose in the overall application, which is designed for facial recognition-based attendance, emotion analysis, and user management.
-
----
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Folder Structure](#folder-structure)
-- [Admin Frontend](#admin-frontend)
-  - [Folder Structure](#admin-folder-structure)
-  - [Pages & Components](#admin-pages--components)
-  - [Libraries & Packages](#admin-libraries--packages)
-  - [Workflow & Functionality](#admin-workflow--functionality)
-- [Client Frontend](#client-frontend)
-  - [Folder Structure](#client-folder-structure)
-  - [Pages & Files](#client-pages--files)
-  - [Libraries & Packages](#client-libraries--packages)
-  - [Workflow & Functionality](#client-workflow--functionality)
-- [Server Backend](#server-backend)
-  - [Folder Structure](#server-folder-structure)
-  - [Key Files & Modules](#server-key-files--modules)
-  - [Libraries & Packages](#server-libraries--packages)
-  - [Workflow & Functionality](#server-workflow--functionality)
-- [End-to-End Workflow](#end-to-end-workflow)
-- [Output & Results](#output--results)
+**PresenSense** is an advanced face recognition attendance system that combines real-time emotion detection, smart camera handling, and modern web technologies to provide a comprehensive attendance solution. The system features a React frontend with fullscreen camera capabilities and a FastAPI backend powered by DeepFace and MediaPipe for accurate face recognition and emotion analysis.
 
 ---
 
+## 📚 Table of Contents
 
-# Project Overview
+1. [🚀 Project Overview](#-project-overview)
+2. [🏗️ Architecture & Tech Stack](#️-architecture--tech-stack)
+3. [📁 Project Structure](#-project-structure)
+4. [🔧 Backend Documentation](#-backend-documentation)
+5. [🎨 Frontend Documentation](#-frontend-documentation)
+6. [📦 Dependencies & Libraries](#-dependencies--libraries)
+7. [⚙️ Configuration & Setup](#️-configuration--setup)
+8. [🚀 Installation & Deployment](#-installation--deployment)
+9. [📖 API Documentation](#-api-documentation)
+10. [🎯 Features & Functionality](#-features--functionality)
+11. [🔒 Security & Best Practices](#-security--best-practices)
+12. [🐛 Troubleshooting](#-troubleshooting)
+13. [🤝 Contributing](#-contributing)
+14. [📄 License](#-license)
 
-PresenSense is a full-stack, AI-powered attendance and engagement tracking system. It provides:
-- **Admin Frontend**: For administrators to manage attendance, capture faces, upload images, and view analytics on emotions and engagement.
-- **Client Frontend**: For end-users to mark attendance and participate in emotion/engagement tracking.
-- **Server Backend**: Handles API requests, facial recognition, emotion analysis, database operations, and business logic.
-# Notes
-# Installation & Running the Project
+---
 
-Follow these steps to install and run PresenSense on your local machine:
+## 🚀 Project Overview
 
-## Prerequisites
-- **Node.js** (v16 or above) and **npm** for frontend apps
-- **Python** (3.8 or above) for backend
-- **pip** for Python package management
-- (Optional) **Docker** for containerized deployment
+PresenSense is a full-stack web application designed to revolutionize attendance tracking through facial recognition technology. The system provides:
 
-## 1. Clone the Repository
+### Key Features
+- **Real-time Face Recognition**: Advanced facial recognition using DeepFace with Facenet model
+- **Emotion Detection**: Real-time emotion analysis using MediaPipe and DeepFace
+- **Attention Tracking**: Eye gaze detection to monitor user attention
+- **Fullscreen Camera Interface**: Immersive camera experience with navbar hiding
+- **Admin Panel**: Complete user management and attendance reporting
+- **Cross-Platform Support**: Works on desktop and mobile browsers
+- **Cloud Integration**: Google Cloud Storage support for scalable image storage
+- **Attendance Deduplication**: Prevents multiple check-ins within configurable time windows
+
+### Use Cases
+- Corporate offices for employee attendance
+- Educational institutions for student attendance
+- Event management for participant tracking
+- Security checkpoints with emotion monitoring
+- Remote work verification systems
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
+
+---
+
+## 🏗️ Architecture & Tech Stack
+
+### Frontend Technology Stack
+- **React 19.1.1**: Modern UI library with latest features
+- **Vite 7.1.2**: Ultra-fast build tool and development server
+- **React Router DOM 7.8.2**: Client-side routing for SPA navigation
+- **Tailwind CSS 4.1.13**: Utility-first CSS framework for rapid styling
+- **ESLint 9.33.0**: Code quality and consistency enforcement
+
+### Backend Technology Stack
+- **FastAPI 0.116.1**: High-performance Python web framework
+- **SQLAlchemy 2.0.43**: Modern Python SQL toolkit and ORM
+- **DeepFace 0.0.95**: Deep learning face recognition library
+- **MediaPipe 0.10.18**: Google's ML framework for perception tasks
+- **OpenCV 4.12.0.88**: Computer vision library for image processing
+- **Uvicorn 0.35.0**: ASGI server for FastAPI applications
+
+### AI/ML Libraries
+- **TensorFlow 2.19.1**: Deep learning framework
+- **Keras 3.11.2**: High-level neural networks API
+- **NumPy 2.1.3**: Numerical computing library
+- **Pandas 2.3.1**: Data manipulation and analysis
+
+### Cloud & Infrastructure
+- **Google Cloud Storage**: Scalable cloud storage solution
+- **Docker**: Containerization for deployment
+- **Gunicorn**: WSGI HTTP server for production
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
+
+---
+
+## 📁 Project Structure
 
 ```
-git clone <your-repo-url>
-cd face-reco
+PresenSense/
+├── 📂 frontend/                    # React frontend application
+│   ├── 📂 public/                 # Static public assets
+│   ├── 📂 src/                    # Source code directory
+│   │   ├── 📂 assets/             # Images, icons, static assets
+│   │   ├── 📂 components/         # Reusable React components
+│   │   │   ├── AdminPanel.jsx     # Admin dashboard component
+│   │   │   ├── Attendance.jsx     # Attendance display component
+│   │   │   ├── CaptureForm.jsx    # Camera capture form
+│   │   │   ├── ClientVerify.jsx   # Main face verification component
+│   │   │   ├── LoginModal.jsx     # Admin authentication modal
+│   │   │   └── UploadForm.jsx     # File upload form
+│   │   ├── 📂 hooks/              # Custom React hooks
+│   │   ├── 📂 layouts/            # Layout components
+│   │   │   └── BaseLayout.jsx     # Main application layout
+│   │   ├── 📂 pages/              # Page-level components
+│   │   │   ├── AdminPage.jsx      # Admin panel page
+│   │   │   ├── NotFoundPage.jsx   # 404 error page
+│   │   │   └── PublicPage.jsx     # Public verification page
+│   │   ├── 📂 utils/              # Utility functions
+│   │   ├── App.jsx                # Main application component
+│   │   ├── config.js              # Frontend configuration
+│   │   ├── index.css              # Global styles
+│   │   └── main.jsx               # Application entry point
+│   ├── .env.example               # Environment variables template
+│   ├── .env.local                 # Local environment variables
+│   ├── eslint.config.js           # ESLint configuration
+│   ├── index.html                 # HTML template
+│   ├── netlify.toml               # Netlify deployment config
+│   ├── package.json               # Frontend dependencies
+│   ├── README.md                  # Frontend documentation
+│   └── vite.config.js             # Vite build configuration
+│
+├── 📂 server/                      # FastAPI backend application
+│   ├── 📂 models/                 # AI/ML model implementations
+│   │   ├── emotion_detection.py   # Emotion analysis models
+│   │   ├── face_recognition.py    # Face recognition models
+│   │   └── __init__.py
+│   ├── 📂 routes/                 # API route handlers
+│   │   ├── admin.py               # Admin API endpoints
+│   │   ├── emotion.py             # Emotion detection APIs
+│   │   ├── match.py               # Face matching APIs
+│   │   └── __init__.py
+│   ├── 📂 uploads/                # Local file storage (development)
+│   ├── 📂 utils/                  # Utility functions
+│   │   ├── storage.py             # Cloud storage utilities
+│   │   └── __init__.py
+│   ├── .dockerignore              # Docker ignore patterns
+│   ├── .gcloudignore              # Google Cloud ignore patterns
+│   ├── config.py                  # Backend configuration
+│   ├── db.py                      # Database models and setup
+│   ├── deploy.md                  # Deployment documentation
+│   ├── Dockerfile                 # Docker container configuration
+│   ├── main.py                    # FastAPI application entry point
+│   ├── requirements.txt           # Python dependencies
+│   ├── requirements-alternative.txt # Alternative dependency versions
+│   └── startup.py                 # Application startup script
+│
+├── .gitignore                     # Git ignore patterns
+└── README.md                      # This comprehensive documentation
 ```
 
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
-## 2. Install and Run the Backend (Server)
+---
 
+## 🔧 Backend Documentation
+
+### Core Application (`main.py`)
+
+The FastAPI application serves as the backend hub, orchestrating all face recognition and emotion detection functionality.
+
+**Key Features:**
+- **Startup Event Handling**: Preloads AI models to reduce first-request latency
+- **CORS Configuration**: Enables cross-origin requests from frontend
+- **Static File Serving**: Handles uploaded images via `/uploads` endpoint
+- **Health Checks**: Provides `/health` and `/ready` endpoints for monitoring
+- **Route Organization**: Modular API structure with separate route files
+
+**Important Functions:**
+```python
+@app.on_event("startup")
+async def startup_event():
+    # Initializes database connection
+    # Creates uploads directory
+    # Preloads face recognition models
+    # Preloads emotion detection models
 ```
+
+### Configuration Management (`config.py`)
+
+Centralized configuration using environment variables and default values.
+
+**Settings Include:**
+- **Database URL**: SQLite for development, PostgreSQL for production
+- **Google Cloud Storage**: Bucket configuration and credentials
+- **Face Recognition Thresholds**: Configurable matching sensitivity
+- **Attendance Deduplication**: Time window for preventing duplicate entries
+
+### Database Layer (`db.py`)
+
+SQLAlchemy-based database models for persistent data storage.
+
+**Models:**
+- **User**: Stores user information and face embeddings
+- **Attendance**: Records attendance events with timestamps
+- **EmotionSession**: Tracks emotion analysis sessions
+- **EmotionRecord**: Individual emotion detection results
+
+### AI/ML Models
+
+#### Face Recognition (`models/face_recognition.py`)
+
+**Technology**: DeepFace with Facenet model
+
+**Core Functions:**
+- `extract_face_embedding()`: Converts face images to numerical embeddings
+- `cosine_similarity()`: Calculates similarity between face embeddings
+- `match_faces()`: Determines if two faces belong to the same person
+- `preload_models()`: Loads models into memory for faster processing
+
+**Process Flow:**
+1. Image preprocessing and face detection
+2. Face embedding extraction using Facenet
+3. Similarity calculation using cosine distance
+4. Threshold-based matching decision
+
+#### Emotion Detection (`models/emotion_detection.py`)
+
+**Technology**: DeepFace + MediaPipe integration
+
+**Features:**
+- Real-time emotion classification (happy, sad, angry, etc.)
+- Eye tracking and gaze direction analysis
+- Attention monitoring through eye aspect ratio
+- Face bounding box detection
+
+**Core Classes:**
+```python
+class EmotionDetector:
+    def __init__(self):
+        # Initialize MediaPipe Face Mesh
+        # Setup eye tracking landmarks
+        
+    def analyze_emotion_deepface(self, image_bytes):
+        # Returns emotion probabilities and dominant emotion
+        
+    def calculate_eye_aspect_ratio(self, eye_landmarks):
+        # Calculates EAR for blink detection
+```
+
+### API Routes
+
+#### Admin Routes (`routes/admin.py`)
+- User registration and management
+- File upload handling
+- Attendance record retrieval
+- Bulk operations for user management
+
+#### Face Matching Routes (`routes/match.py`)
+- Real-time face verification
+- Stream processing for continuous recognition
+- Attendance logging with deduplication
+- Emotion-enhanced matching
+
+#### Emotion Routes (`routes/emotion.py`)
+- Emotion analysis sessions
+- Frame-by-frame emotion detection
+- Attention tracking statistics
+- Session management and reporting
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
+
+---
+
+## 🎨 Frontend Documentation
+
+### Application Structure
+
+#### Main App Component (`App.jsx`)
+
+React Router-based navigation system with three main routes:
+
+```jsx
+<Routes>
+  <Route path="/" element={<PublicPage />} />        // Public verification
+  <Route path="/admin" element={<AdminPage />} />    // Admin panel
+  <Route path="*" element={<NotFoundPage />} />      // 404 handling
+</Routes>
+```
+
+#### Configuration (`config.js`)
+
+**Environment-based API Configuration:**
+- Development: `http://localhost:8000`
+- Production: Configurable via `VITE_API_BASE_URL`
+- Comprehensive endpoint mapping for all API calls
+- Admin credentials for demo authentication
+
+### Core Components
+
+#### ClientVerify Component (`components/ClientVerify.jsx`)
+
+**The heart of the face verification system with advanced features:**
+
+**Camera Management:**
+- Multi-camera support (front/back camera switching)
+- Stream maintenance during fullscreen transitions
+- Automatic stream recovery and error handling
+- Resolution and facing mode optimization
+
+**Fullscreen Implementation:**
+- Browser viewport fullscreen (not native OS fullscreen)
+- Navbar hiding during fullscreen mode
+- Keyboard escape handling for exit
+- Stream continuity during mode changes
+
+**Emotion Detection Integration:**
+- Real-time emotion analysis overlay
+- Face bounding box visualization
+- Attention tracking with statistics
+- Session-based emotion monitoring
+
+**Key Features:**
+```jsx
+const enterFullscreen = () => {
+    setFullscreen(true)
+    if (onFullscreenChange) onFullscreenChange(true)
+    // Maintains camera stream during transition
+}
+
+const startEmotionDetection = async () => {
+    // Creates emotion analysis session
+    // Begins frame-by-frame processing
+    // Updates UI with real-time results
+}
+```
+
+#### Admin Panel (`components/AdminPanel.jsx`)
+
+**Tabbed interface for administrative functions:**
+
+1. **Upload Tab**: File-based user registration
+2. **Capture Tab**: Camera-based user registration  
+3. **Attendance Tab**: View and manage attendance records
+
+**Features:**
+- Responsive design with mobile optimization
+- Progress indicators for upload operations
+- Real-time validation and error handling
+- Batch operations support
+
+#### Authentication System
+
+**LoginModal Component (`components/LoginModal.jsx`):**
+- Session-based authentication using sessionStorage
+- Admin credential verification
+- Auto-login for returning admin users
+- Secure logout with session cleanup
+
+### Page Components
+
+#### PublicPage (`pages/PublicPage.jsx`)
+
+**Main user-facing verification interface:**
+- Fullscreen-aware navbar management
+- Responsive design with mobile optimization
+- Real-time connection to ClientVerify component
+- Dynamic content padding based on fullscreen state
+
+#### AdminPage (`pages/AdminPage.jsx`)
+
+**Protected admin interface:**
+- Authentication gate with LoginModal
+- Session persistence across browser refreshes
+- Full AdminPanel component integration
+- Logout functionality with navigation
+
+### Layout System (`layouts/BaseLayout.jsx`)
+
+**Shared layout structure:**
+- Gradient background with visual effects
+- Conditional navbar rendering
+- Responsive header with logo and navigation
+- Flexible content area for page-specific components
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
+
+---
+
+## 📦 Dependencies & Libraries
+
+### Frontend Dependencies
+
+#### Core Framework
+- **React 19.1.1**: Latest React with concurrent features and improved hooks
+  - *Purpose*: UI library for building interactive user interfaces
+  - *Why*: Component-based architecture, virtual DOM, strong ecosystem
+
+- **React DOM 19.1.1**: React rendering library for web browsers
+  - *Purpose*: Renders React components to the DOM
+  - *Why*: Essential for web-based React applications
+
+#### Routing & Navigation
+- **React Router DOM 7.8.2**: Declarative routing for React applications
+  - *Purpose*: Client-side navigation and URL management
+  - *Why*: SPA navigation without full page refreshes, SEO-friendly routing
+
+#### Styling & UI
+- **Tailwind CSS 4.1.13**: Utility-first CSS framework
+  - *Purpose*: Rapid UI development with pre-built utility classes
+  - *Why*: Consistent design system, responsive design, smaller bundle size
+  
+- **@tailwindcss/vite 4.1.13**: Vite integration for Tailwind CSS
+  - *Purpose*: Seamless Tailwind integration with Vite build system
+  - *Why*: Optimized CSS processing and hot reload support
+
+#### Build Tools
+- **Vite 7.1.2**: Next-generation frontend build tool
+  - *Purpose*: Development server and production bundler
+  - *Why*: Faster development with hot module replacement, optimized builds
+
+- **@vitejs/plugin-react 5.0.0**: Vite plugin for React support
+  - *Purpose*: React-specific optimizations for Vite
+  - *Why*: JSX processing, hot reload for React components
+
+#### Code Quality
+- **ESLint 9.33.0**: JavaScript linting utility
+  - *Purpose*: Code quality enforcement and error detection
+  - *Why*: Maintains code consistency, catches potential bugs
+
+- **eslint-plugin-react-hooks 5.2.0**: ESLint rules for React Hooks
+  - *Purpose*: Enforces Rules of Hooks
+  - *Why*: Prevents common React Hook usage errors
+
+### Backend Dependencies
+
+#### Web Framework
+- **FastAPI 0.116.1**: Modern Python web framework
+  - *Purpose*: High-performance API development
+  - *Why*: Automatic OpenAPI documentation, type hints, async support
+
+- **Uvicorn 0.35.0**: ASGI server implementation
+  - *Purpose*: Serves FastAPI applications
+  - *Why*: High-performance async server, production-ready
+
+#### Database & ORM
+- **SQLAlchemy 2.0.43**: Python SQL toolkit and ORM
+  - *Purpose*: Database abstraction and object-relational mapping
+  - *Why*: Database agnostic, powerful query capabilities, type safety
+
+- **psycopg2-binary 2.9.10**: PostgreSQL adapter for Python
+  - *Purpose*: PostgreSQL database connectivity
+  - *Why*: Production database support, connection pooling
+
+#### AI/ML Libraries
+- **DeepFace 0.0.95**: Deep learning face recognition library
+  - *Purpose*: Face detection, recognition, and emotion analysis
+  - *Why*: Pre-trained models, multiple algorithms, easy integration
+
+- **MediaPipe 0.10.18**: Google's machine learning framework
+  - *Purpose*: Real-time perception tasks (face mesh, eye tracking)
+  - *Why*: Optimized for real-time processing, comprehensive face analysis
+
+- **OpenCV 4.12.0.88**: Computer vision library
+  - *Purpose*: Image processing and computer vision operations
+  - *Why*: Comprehensive CV toolkit, efficient image processing
+
+- **TensorFlow 2.19.1**: Open-source machine learning framework
+  - *Purpose*: Deep learning model execution
+  - *Why*: Industry standard, GPU acceleration, model compatibility
+
+#### Data Processing
+- **NumPy 2.1.3**: Numerical computing library
+  - *Purpose*: Array operations and mathematical functions
+  - *Why*: Fundamental for AI/ML operations, performance optimization
+
+- **Pandas 2.3.1**: Data manipulation and analysis library
+  - *Purpose*: Data structures and analysis tools
+  - *Why*: Efficient data handling, CSV/JSON processing
+
+#### Cloud Integration
+- **google-cloud-storage 3.3.0**: Google Cloud Storage client
+  - *Purpose*: Cloud-based file storage and retrieval
+  - *Why*: Scalable storage solution, global CDN, secure access
+
+#### Development & Production
+- **Gunicorn 23.0.0**: WSGI HTTP server
+  - *Purpose*: Production deployment server
+  - *Why*: Process management, load balancing, production stability
+
+- **python-multipart 0.0.20**: Multipart form data parsing
+  - *Purpose*: Handle file uploads in FastAPI
+  - *Why*: Essential for image upload functionality
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
+
+---
+
+## ⚙️ Configuration & Setup
+
+### Environment Variables
+
+#### Frontend Configuration (`.env.local`)
+```env
+# API Base URL - Change for production deployment
+VITE_API_BASE_URL=http://localhost:8000
+
+# Development mode settings
+VITE_DEV_MODE=true
+```
+
+#### Backend Configuration (Environment Variables)
+```env
+# Database Configuration
+DATABASE_URL=sqlite:///./backend.db  # Development
+DATABASE_URL=postgresql://user:pass@host:5432/db  # Production
+
+# Google Cloud Storage
+GCP_PROJECT_ID=your-project-id
+GCP_BUCKET_NAME=your-bucket-name
+GCP_CREDENTIALS_PATH=/path/to/credentials.json
+
+# Face Recognition Settings
+MATCH_THRESHOLD=0.6  # Lower = more lenient matching
+ATTENDANCE_DEDUP_SECONDS=300  # 5-minute deduplication window
+
+# Server Configuration
+PORT=8000  # Cloud Run will set this automatically
+PYTHONUNBUFFERED=1  # For proper logging in containers
+```
+
+### Development Setup
+
+#### Prerequisites
+- **Node.js 18+**: For frontend development
+- **Python 3.8+**: For backend development
+- **Git**: For version control
+
+#### Frontend Setup
+```bash
+cd frontend
+npm install                    # Install dependencies
+npm run dev                   # Start development server
+npm run build                 # Build for production
+npm run lint                  # Run code linting
+```
+
+#### Backend Setup
+```bash
 cd server
-pip install -r requirements.txt
+python -m venv .venv          # Create virtual environment
+source .venv/bin/activate     # Linux/Mac
+# or
+.venv\Scripts\activate        # Windows
+
+pip install -r requirements.txt  # Install dependencies
+python main.py                   # Start development server
 ```
 
-### Run with Python (default)
+### Production Deployment
+
+#### Docker Deployment
+```dockerfile
+# Backend Dockerfile included in server/
+FROM python:3.11-slim
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["python", "main.py"]
 ```
+
+#### Frontend Deployment (Netlify)
+```toml
+# netlify.toml configuration included
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
+
+---
+
+## 🚀 Installation & Deployment
+
+### Quick Start (Development)
+
+1. **Clone the Repository**
+```bash
+git clone https://github.com/Sahadipankar/PresenSense.git
+cd PresenSense
+```
+
+2. **Backend Setup**
+```bash
+cd server
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# or .venv\Scripts\activate  # Windows
+pip install -r requirements.txt
 python main.py
 ```
-The backend will start (by default) on `http://localhost:8000` or as configured in `config.py`.
 
-### Run with Uvicorn (recommended for FastAPI)
-If your backend uses FastAPI, you can run it with Uvicorn for better performance and auto-reload:
-```
-.venv\Scripts\activate
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
-- `main:app` refers to the `app` object in `main.py`.
-- `--reload` enables auto-reload for development.
-
-The backend will now be running at http://localhost:8000.
-
-## 3. Install and Run the Admin Frontend
-
-```
-cd ../admin
+3. **Frontend Setup (New Terminal)**
+```bash
+cd frontend
 npm install
 npm run dev
 ```
-The admin dashboard will be available at the URL shown in the terminal (usually `http://localhost:5173`).
 
-## 4. Install and Run the Client Frontend
+4. **Access Application**
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8000`
+- API Documentation: `http://localhost:8000/docs`
 
-```
-cd ../client
-npm install
-npm run dev
-```
-The client app will be available at the URL shown in the terminal (usually `http://localhost:5173`).
+### Production Deployment
 
-## 5. (Optional) Run with Docker
-
-You can use the provided `Dockerfile` in the `server` folder to build and run the backend in a container:
-
-```
+#### Backend (Google Cloud Run)
+```bash
+# Build and deploy to Google Cloud Run
 cd server
-docker build -t presensense-backend .
-docker run -p 8000:8000 presensense-backend
+gcloud run deploy presensense-backend \
+  --source . \
+  --platform managed \
+  --region asia-south1 \
+  --allow-unauthenticated
 ```
+
+#### Frontend (Netlify)
+```bash
+# Build and deploy to Netlify
+cd frontend
+npm run build
+# Deploy dist/ folder to Netlify
+```
+
+#### Environment Configuration
+Update frontend `.env.local`:
+```env
+VITE_API_BASE_URL=https://your-backend-url.run.app
+```
+
+### Database Migration (Production)
+
+```python
+# For PostgreSQL in production
+from sqlalchemy import create_engine
+from db import Base, DATABASE_URL
+
+engine = create_engine(DATABASE_URL)
+Base.metadata.create_all(bind=engine)
+```
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
 ---
 
-**This README provides a comprehensive overview for developers and users to understand, run, and extend PresenSense.**
+## 📖 API Documentation
 
-[Back to Top](#table-of-contents)
+### Authentication Endpoints
+
+#### Admin Login (Frontend Only)
+- **Endpoint**: Frontend authentication
+- **Method**: Session-based
+- **Credentials**: `admin` / `admin123` (configurable)
+
+### User Management API
+
+#### Register User
+```http
+POST /admin/upload
+Content-Type: multipart/form-data
+
+name: string (required)
+file: image file (required)
+```
+
+**Response:**
+```json
+{
+  "message": "User registered successfully",
+  "user_id": 1,
+  "name": "John Doe"
+}
+```
+
+#### Get Attendance Records
+```http
+GET /admin/attendance
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "user_name": "John Doe", 
+    "timestamp": "2025-01-15T10:30:00Z"
+  }
+]
+```
+
+### Face Recognition API
+
+#### Verify Face
+```http
+POST /match/
+Content-Type: multipart/form-data
+
+file: image file (required)
+```
+
+**Response (Success):**
+```json
+{
+  "message": "Face matched",
+  "user_id": 1,
+  "score": 0.85,
+  "dedup": false
+}
+```
+
+**Response (No Match):**
+```json
+{
+  "detail": "No match found (best score=0.45, threshold=0.6)"
+}
+```
+
+#### Stream Processing
+```http
+POST /match/stream
+Content-Type: multipart/form-data
+
+file: image file (required)
+```
+
+### Emotion Detection API
+
+#### Start Emotion Session
+```http
+POST /emotion/start-session
+```
+
+**Response:**
+```json
+{
+  "session_id": "uuid-string",
+  "status": "active"
+}
+```
+
+#### Analyze Frame
+```http
+POST /emotion/analyze-frame
+Content-Type: multipart/form-data
+
+session_id: string (required)
+file: image file (required)
+```
+
+**Response:**
+```json
+{
+  "emotion": "happy",
+  "confidence": 0.87,
+  "is_looking_at_camera": true,
+  "face_bbox": [100, 50, 200, 150],
+  "attention_stats": {
+    "total_frames": 150,
+    "attention_frames": 120,
+    "attention_percentage": 80.0
+  }
+}
+```
+
+### Health Check API
+
+#### Health Status
+```http
+GET /health
+```
+
+#### Readiness Probe
+```http
+GET /ready
+```
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
 ---
 
-# Folder Structure
+## 🎯 Features & Functionality
 
-```
-face-reco/
-│
-├── admin/      # Admin dashboard frontend (React + Vite)
-├── client/     # Client/user-facing frontend (React + Vite)
-└── server/     # Python backend (FastAPI/Flask, face recognition)
+### Face Recognition System
+
+#### Core Recognition Features
+- **Multiple Algorithm Support**: Facenet, VGG-Face, OpenFace compatibility
+- **High Accuracy**: Configurable threshold (default 0.6) for optimal balance
+- **Speed Optimization**: Model preloading reduces first-request latency
+- **Error Handling**: Graceful handling of no-face or multiple-face scenarios
+
+#### Recognition Workflow
+1. **Image Capture**: Camera or file upload
+2. **Face Detection**: Automatic face extraction from images
+3. **Embedding Generation**: Convert face to 128-dimension vector
+4. **Similarity Calculation**: Cosine similarity against stored faces  
+5. **Threshold Matching**: Decision based on configurable threshold
+6. **Attendance Logging**: Automatic attendance with deduplication
+
+### Emotion Detection & Analysis
+
+#### Real-time Emotion Recognition
+- **7 Basic Emotions**: Happy, Sad, Angry, Fear, Surprise, Disgust, Neutral
+- **Confidence Scores**: Probability distribution across all emotions
+- **Dominant Emotion**: Primary emotion with highest confidence
+- **Continuous Analysis**: Frame-by-frame processing for live feeds
+
+#### Advanced Attention Tracking
+- **Eye Gaze Detection**: MediaPipe-powered eye landmark tracking
+- **Attention Metrics**: Percentage of time looking at camera
+- **Blink Detection**: Eye aspect ratio calculation for blink events
+- **Session Statistics**: Comprehensive attention analysis over time
+
+#### Emotion Analysis Features
+```python
+# Emotion detection capabilities
+emotions = {
+    'happy': 0.75,
+    'neutral': 0.15,
+    'sad': 0.05,
+    'angry': 0.03,
+    'surprise': 0.02
+}
+
+attention_metrics = {
+    'total_frames': 300,
+    'attention_frames': 240,
+    'attention_percentage': 80.0,
+    'average_confidence': 0.82
+}
 ```
 
-[Back to Top](#table-of-contents)
+### Camera & Interface Features
+
+#### Advanced Camera Management
+- **Multi-Camera Support**: Front/back camera switching
+- **Stream Persistence**: Maintains video stream during UI changes
+- **Resolution Optimization**: Automatic best resolution selection
+- **Error Recovery**: Automatic fallback and retry mechanisms
+
+#### Fullscreen Experience  
+- **Browser Fullscreen**: CSS-based viewport fullscreen
+- **Navbar Auto-Hide**: Automatic UI element hiding in fullscreen
+- **Keyboard Controls**: ESC key for fullscreen exit
+- **Stream Continuity**: Uninterrupted video during mode changes
+
+#### User Interface Features
+- **Responsive Design**: Mobile and desktop optimization
+- **Real-time Feedback**: Live status updates and error messages
+- **Progress Indicators**: Upload and processing progress
+- **Accessibility**: ARIA labels and keyboard navigation
+
+### Administrative Features
+
+#### User Management
+- **Bulk Registration**: Multiple user upload support
+- **User Search**: Find users by name or ID
+- **Profile Management**: Update user information and photos
+- **Data Export**: Attendance data export to CSV/JSON
+
+#### Attendance Management
+- **Real-time Tracking**: Live attendance monitoring
+- **Deduplication**: Configurable time windows (default 5 minutes)
+- **Historical Reports**: Date range filtering and reporting
+- **Statistics Dashboard**: Attendance analytics and insights
+
+#### Security Features
+- **Session Management**: Secure admin session handling
+- **Input Validation**: Comprehensive data validation
+- **Error Sanitization**: Safe error message display
+- **CORS Protection**: Configurable cross-origin policies
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
 ---
 
-# Admin Frontend
+## 🔒 Security & Best Practices
 
-The `admin` folder contains the admin dashboard built with React and Vite. It allows administrators to manage attendance, capture new faces, and upload images for recognition.
+### Authentication & Authorization
 
-## Admin Folder Structure
+#### Admin Security
+- **Session-based Authentication**: Secure admin sessions with sessionStorage
+- **Credential Management**: Configurable admin credentials (change defaults!)
+- **Session Timeout**: Automatic logout after inactivity
+- **HTTPS Enforcement**: SSL/TLS for production deployments
 
+#### API Security
+- **Input Validation**: Comprehensive request validation
+- **File Type Restrictions**: Image format validation
+- **Size Limits**: File size restrictions to prevent DoS
+- **Rate Limiting**: API endpoint protection (recommended for production)
+
+### Data Protection
+
+#### Personal Data Handling
+- **Face Embedding Storage**: Only mathematical representations, not raw images
+- **Data Minimization**: Store only necessary information
+- **Anonymization Options**: User ID-based identification
+- **GDPR Compliance**: Data deletion and export capabilities
+
+#### Database Security
+- **SQL Injection Protection**: SQLAlchemy ORM prevents injection attacks
+- **Parameterized Queries**: Safe database interactions
+- **Connection Encryption**: Encrypted database connections in production
+- **Backup Strategies**: Regular automated backups
+
+### Infrastructure Security
+
+#### Cloud Security
+- **Google Cloud IAM**: Proper service account permissions
+- **Bucket Policies**: Restricted cloud storage access
+- **Network Security**: VPC and firewall configurations
+- **Container Security**: Minimal Docker images, no root privileges
+
+#### Production Recommendations
+```python
+# Recommended production settings
+SECURITY_HEADERS = {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+}
+
+# CORS for production
+CORS_ORIGINS = [
+    'https://your-frontend-domain.com',
+    # Remove wildcards in production
+]
 ```
-admin/
-│
-├── index.html
-├── package.json
-├── README.md
-├── vite.config.js
-└── src/
-    ├── App.jsx
-    ├── config.js
-    ├── main.jsx
-    ├── styles.css
-    └── components/
-        ├── Attendance.jsx
-        ├── CaptureForm.jsx
-        └── UploadForm.jsx
-```
 
-[Back to Top](#table-of-contents)
+### Privacy Considerations
 
-## Admin Pages & Components
+#### Biometric Data Handling
+- **Consent Management**: Clear user consent for biometric processing
+- **Data Retention**: Configurable retention policies
+- **Access Logging**: Audit trails for data access
+- **Anonymization**: Option to use anonymized identifiers
 
-- **index.html**: The HTML entry point for the Vite-powered React app.
-- **package.json**: Lists dependencies (React, Vite, etc.) and scripts for development/build.
-- **vite.config.js**: Vite configuration for fast development and optimized builds.
-- **src/App.jsx**: Main React component; sets up routing and layout for the admin dashboard.
-- **src/config.js**: Stores configuration variables (e.g., API endpoints).
-- **src/main.jsx**: Entry point for React; renders the `App` component.
-- **src/styles.css**: Global styles for the admin dashboard.
-- **src/components/Attendance.jsx**: Component to view and manage attendance records.
-- **src/components/CaptureForm.jsx**: Form to capture new face data (e.g., via webcam or file upload).
-- **src/components/UploadForm.jsx**: Form to upload images for recognition or registration.
+#### Compliance Features
+- **Data Export**: GDPR Article 20 compliance (data portability)
+- **Data Deletion**: Right to be forgotten implementation
+- **Access Logs**: Comprehensive audit trails
+- **Privacy Notices**: Clear data usage documentation
 
-[Back to Top](#table-of-contents)
-
-## Admin Libraries & Packages
-
-- **React**: UI library for building interactive user interfaces.
-- **Vite**: Fast build tool and development server for React apps.
-- **Other dependencies** (as per `package.json`):
-  - UI libraries (e.g., Material-UI, if present)
-  - HTTP clients (e.g., axios or fetch)
-  - State management (if used)
-
-**Purpose:**
-- React enables modular, reusable components.
-- Vite provides fast hot-reloading and optimized builds.
-- UI libraries help create professional, accessible interfaces.
-- HTTP clients are used for API communication with the backend.
-
-[Back to Top](#table-of-contents)
-
-## Admin Workflow & Functionality
-
-1. **Login/Access**: Admin accesses the dashboard via the browser.
-2. **Attendance Management**: View, filter, and manage attendance records using `Attendance.jsx`.
-3. **Capture New Faces**: Use `CaptureForm.jsx` to capture new face data (webcam or upload).
-4. **Upload Images**: Use `UploadForm.jsx` to upload images for recognition or registration.
-5. **API Communication**: All actions interact with the backend server via REST APIs defined in `config.js`.
-
-[Back to Top](#table-of-contents)
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
 ---
 
-# Client Frontend
+## 🐛 Troubleshooting
 
-The `client` folder contains the user-facing frontend, also built with React and Vite. It allows users to interact with the facial recognition system (e.g., mark attendance).
+### Common Issues & Solutions
 
-## Client Folder Structure
+#### Frontend Issues
 
-```
-client/
-│
-├── index.html
-├── package.json
-├── vite.config.js
-└── src/
-    ├── App.jsx
-    ├── config.js
-    ├── main.jsx
-    └── styles.css
+**Camera Not Working**
+```javascript
+// Error: Camera access denied
+Solution:
+1. Ensure HTTPS in production (camera requires secure context)
+2. Check browser permissions for camera access
+3. Verify camera is not being used by another application
+4. Test with different browsers (Chrome, Firefox, Safari)
 ```
 
-[Back to Top](#table-of-contents)
-
-## Client Pages & Files
-
-- **index.html**: HTML entry point for the client app.
-- **package.json**: Lists dependencies and scripts for the client app.
-- **vite.config.js**: Vite configuration for the client app.
-- **src/App.jsx**: Main React component for the client interface.
-- **src/config.js**: Stores configuration variables (e.g., API endpoints).
-- **src/main.jsx**: Entry point for React; renders the `App` component.
-- **src/styles.css**: Global styles for the client interface.
-
-[Back to Top](#table-of-contents)
-
-## Client Libraries & Packages
-
-- **React**: For building the user interface.
-- **Vite**: For fast development and builds.
-- **Other dependencies** (as per `package.json`):
-  - HTTP clients (e.g., axios or fetch)
-  - UI libraries (if present)
-
-**Purpose:**
-- React enables a responsive, interactive user experience.
-- Vite ensures fast development cycles.
-- HTTP clients are used for communication with the backend.
-
-[Back to Top](#table-of-contents)
-
-## Client Workflow & Functionality
-
-1. **User Access**: Users access the client app via the browser.
-2. **Mark Attendance**: Users interact with the app to mark attendance (e.g., via webcam or upload).
-3. **API Communication**: The app communicates with the backend server for recognition and attendance marking.
-
-[Back to Top](#table-of-contents)
-
----
-
-# Server Backend
-
-The `server` folder contains the backend, written in Python. It handles API requests, facial recognition, and database operations.
-
-## Server Folder Structure
-
-```
-server/
-│
-├── __init__.py
-├── backend.db
-├── config.py
-├── db.py
-├── deploy.md
-├── Dockerfile
-├── main.py
-├── requirements.txt
-├── requirements-alternative.txt
-├── startup.py
-├── test_local.py
-├── logs/
-├── models/
-│   ├── __init__.py
-│   └── face_recognition.py
-├── routes/
-│   ├── __init__.py
-│   ├── admin.py
-│   └── match.py
-├── uploads/
-└── utils/
-    ├── __init__.py
-    └── storage.py
+**Fullscreen Mode Problems**
+```javascript
+// Navbar still visible in fullscreen
+Solution:
+1. Check fullscreen state propagation from ClientVerify to PublicPage
+2. Verify onFullscreenChange prop is correctly passed
+3. Ensure CSS classes are applied for fullscreen mode
+4. Test escape key functionality
 ```
 
-[Back to Top](#table-of-contents)
+**Build Errors**
+```bash
+# Vite build failures
+Solution:
+npm run lint                    # Check for linting errors
+rm -rf node_modules package-lock.json
+npm install                     # Clean reinstall
+npm run build                   # Retry build
+```
 
-## Server Key Files & Modules
+#### Backend Issues
 
-- **main.py**: Entry point for the backend server (likely FastAPI or Flask). Defines API endpoints.
-- **config.py**: Configuration settings (e.g., database URI, secret keys).
-- **db.py**: Database connection and ORM logic.
-- **models/face_recognition.py**: Core facial recognition logic (using libraries like `face_recognition`, OpenCV, etc.).
-- **routes/admin.py**: API routes for admin operations (attendance, user management).
-- **routes/match.py**: API routes for face matching/recognition.
-- **utils/storage.py**: Utility functions for file storage (e.g., saving uploads).
-- **uploads/**: Directory for storing uploaded images.
-- **logs/**: Directory for server logs.
-- **Dockerfile**: Containerization for deployment.
-- **requirements.txt**: Python dependencies (Flask/FastAPI, face_recognition, etc.).
+**Model Loading Errors**
+```python
+# DeepFace model download failures
+Solution:
+1. Check internet connection for model downloads
+2. Ensure sufficient disk space (~2GB for models)
+3. Verify Python version compatibility (3.8+)
+4. Try manual model download:
+   from deepface import DeepFace
+   DeepFace.build_model('Facenet')
+```
 
-[Back to Top](#table-of-contents)
+**Face Recognition Accuracy**
+```python
+# Poor recognition results
+Solutions:
+1. Adjust MATCH_THRESHOLD (lower = more lenient)
+2. Ensure good lighting conditions
+3. Use front-facing camera for registration
+4. Retake photos with better face positioning
+5. Check image quality and resolution
+```
 
-## Server Libraries & Packages
+**Database Connection Issues**
+```python
+# SQLite database errors
+Solution:
+1. Ensure write permissions in server directory
+2. Check DATABASE_URL configuration
+3. Verify SQLAlchemy version compatibility
+4. For PostgreSQL: Check connection string format
+   DATABASE_URL=postgresql://user:pass@host:5432/dbname
+```
 
-- **Flask/FastAPI**: For building RESTful APIs.
-- **face_recognition**: For facial recognition tasks.
-- **OpenCV**: For image processing.
-- **SQLite**: For lightweight database storage (`backend.db`).
-- **Other dependencies**: As listed in `requirements.txt` (e.g., numpy, uvicorn, etc.).
+#### Deployment Issues
 
-**Purpose:**
-- Web frameworks handle API requests and routing.
-- `face_recognition` and OpenCV perform face detection and matching.
-- SQLite stores user and attendance data.
+**Google Cloud Run Deployment**
+```bash
+# Container startup failures
+Solution:
+1. Check Cloud Run logs: gcloud run logs tail
+2. Verify PORT environment variable usage
+3. Ensure 0.0.0.0 binding in uvicorn
+4. Check container memory limits (increase if needed)
+5. Verify all dependencies in requirements.txt
+```
 
-[Back to Top](#table-of-contents)
+**Netlify Frontend Deployment**  
+```bash
+# Build failures on Netlify
+Solution:
+1. Set Node.js version in package.json:
+   "engines": { "node": ">=18.0.0" }
+2. Configure environment variables in Netlify dashboard
+3. Check build logs for specific errors
+4. Verify build command: npm run build
+```
 
-## Server Workflow & Functionality
+#### Performance Issues
 
-1. **API Endpoints**: Exposes endpoints for face registration, recognition, and attendance management.
-2. **Face Processing**: Receives images, processes them, and matches faces using `face_recognition`.
-3. **Database Operations**: Stores and retrieves user and attendance data.
-4. **File Storage**: Handles image uploads and storage.
-5. **Logging**: Maintains logs for debugging and monitoring.
+**Slow First Request**
+```python
+# Model loading causing delays
+Solution:
+1. Implement model preloading in startup event
+2. Use model caching strategies
+3. Consider model quantization for smaller sizes
+4. Implement health check warmup requests
+```
 
-[Back to Top](#table-of-contents)
+**Memory Usage**
+```python
+# High memory consumption
+Solutions:
+1. Implement image resizing before processing
+2. Use batch processing for multiple faces
+3. Clear temporary files after processing
+4. Monitor and limit concurrent requests
+```
+
+### Debug Mode Setup
+
+#### Frontend Debugging
+```javascript
+// Enable verbose logging
+localStorage.setItem('debug', 'presensense:*')
+
+// Monitor API calls
+console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL)
+```
+
+#### Backend Debugging
+```python
+# Enable debug logging
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Monitor model performance
+import time
+start_time = time.time()
+# ... processing ...
+print(f"Processing time: {time.time() - start_time:.2f}s")
+```
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
 ---
 
-# End-to-End Workflow
+## 🤝 Contributing
 
-1. **Admin registers users and manages attendance via the admin dashboard.**
-2. **Users mark attendance via the client app (face capture/upload).**
-3. **Both frontends communicate with the backend via REST APIs.**
-4. **Backend processes images, performs recognition, and updates the database.**
-5. **Results (attendance, recognition status) are displayed in the respective frontends.**
+### Development Guidelines
 
-[Back to Top](#table-of-contents)
+#### Code Style
+- **Frontend**: ESLint configuration with React hooks rules
+- **Backend**: PEP 8 Python style guide
+- **Commit Messages**: Conventional commits format
+- **Branch Naming**: `feature/description`, `fix/bug-description`
+
+#### Pull Request Process
+1. **Fork** the repository
+2. **Create** feature branch from `main`
+3. **Implement** changes with tests
+4. **Update** documentation if needed
+5. **Submit** pull request with detailed description
+
+#### Testing Requirements
+```bash
+# Frontend testing
+npm run lint                    # Code linting
+npm run test                    # Unit tests (add when available)
+
+# Backend testing  
+python -m pytest              # Run test suite (add when available)
+flake8 .                       # Code linting
+```
+
+### Feature Requests
+
+#### Enhancement Ideas
+- **Multi-language Support**: Internationalization for global deployment
+- **Advanced Analytics**: Attendance trends and insights dashboard  
+- **Mobile App**: Native mobile application for easier access
+- **API Rate Limiting**: Production-grade request throttling
+- **Advanced Authentication**: OAuth2, LDAP integration
+- **Batch Processing**: Multiple face processing in single request
+
+#### Bug Reports
+Please include:
+- **Environment**: OS, browser/Python version, deployment type
+- **Steps to Reproduce**: Detailed reproduction steps
+- **Expected Behavior**: What should happen
+- **Actual Behavior**: What actually happens  
+- **Screenshots/Logs**: Visual evidence and error logs
+
+### Code Architecture Guidelines
+
+#### Frontend Architecture
+```javascript
+// Component structure
+components/
+├── atoms/          // Basic UI elements
+├── molecules/      // Component combinations  
+├── organisms/      // Complex components
+└── templates/      // Page-level layouts
+
+// State management
+- Use React hooks for local state
+- Context API for global state
+- Avoid prop drilling with proper composition
+```
+
+#### Backend Architecture
+```python
+# Follow FastAPI best practices
+- Use dependency injection for database sessions
+- Implement proper error handling with HTTP exceptions
+- Use Pydantic models for request/response validation
+- Follow repository pattern for data access
+```
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)
 
 ---
 
-# Output & Results
+## 📄 License
 
-- **Admin Dashboard**: View and manage attendance, register new users, upload images.
-- **Client App**: Mark attendance, receive feedback on recognition status.
-- **Backend**: Processes images, matches faces, updates attendance records, and stores data securely.
+### MIT License
 
-**End Result:**
-- A complete facial recognition-based attendance system with separate interfaces for admins and users, powered by a robust Python backend.
+```
+MIT License
 
-[Back to Top](#table-of-contents)
+Copyright (c) 2024 PresenSense - Smart Face Recognition Attendance System
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### Third-Party Licenses
+
+#### AI/ML Libraries
+- **DeepFace**: MIT License
+- **MediaPipe**: Apache License 2.0  
+- **TensorFlow**: Apache License 2.0
+- **OpenCV**: Apache License 2.0
+
+#### Web Framework Libraries
+- **FastAPI**: MIT License
+- **React**: MIT License
+- **Tailwind CSS**: MIT License
+
+### Attribution Requirements
+
+When using PresenSense in your projects:
+1. **Retain Copyright Notice**: Keep original copyright and license notices
+2. **Document Changes**: Clearly mark any modifications made
+3. **Credit Original Authors**: Acknowledge the original PresenSense project
+4. **Share Improvements**: Consider contributing back to the open source community
+
+### Commercial Use
+
+PresenSense is free for commercial use under MIT License terms. However:
+- **Biometric Data**: Ensure compliance with local biometric data regulations
+- **Privacy Laws**: Implement proper consent and privacy protections  
+- **Security**: Use appropriate security measures for production deployments
+- **Liability**: The software is provided "as is" without warranties
 
 ---
 
-# Notes
-- For detailed API documentation, refer to the backend code and comments.
-- For UI/UX customization, modify the React components and styles in the respective `src/` folders.
-- For deployment, use the provided Dockerfile and requirements files.
+## 📞 Support & Contact
+
+### Community Support
+- **GitHub Issues**: [Report bugs and request features](https://github.com/Sahadipankar/PresenSense/issues)
+- **Discussions**: [Community discussions and Q&A](https://github.com/Sahadipankar/PresenSense/discussions)
+- **Wiki**: [Additional documentation and guides](https://github.com/Sahadipankar/PresenSense/wiki)
+
+### Professional Support
+For enterprise deployments and professional support:
+- **Email**: [Contact the maintainers](mailto:contact@presensense.com)
+- **Consulting**: Custom implementation and integration services
+- **Training**: Team training and best practices workshops
+
+### Acknowledgments
+
+#### Contributors
+- **Sahadipankar**: Original creator and maintainer
+- **Community Contributors**: Thank you to all contributors who help improve PresenSense
+
+#### Technologies
+Special thanks to the open source projects that make PresenSense possible:
+- **Facebook/Meta**: React and associated tools
+- **Google**: MediaPipe, TensorFlow AI frameworks
+- **SerengtiY**: DeepFace library for face recognition
+- **FastAPI Team**: Modern Python web framework
+- **Tailwind Labs**: Utility-first CSS framework
 
 ---
 
-**This README provides a comprehensive overview for developers and users to understand, run, and extend the Face Recognition System.**
+**Built with ❤️ by the PresenSense Community**
+
+*Revolutionizing attendance tracking through intelligent face recognition and emotion analysis*
+
+[⬆️ Back to Top](#-presensense---smart-face-recognition-attendance-system)

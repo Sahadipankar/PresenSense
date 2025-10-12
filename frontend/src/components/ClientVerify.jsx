@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { API_ENDPOINTS } from '../config.js'
 
-export default function ClientVerify() {
+export default function ClientVerify({ onFullscreenChange }) {
     const [msg, setMsg] = useState('')
     const [ok, setOk] = useState(false)
     const videoRef = useRef(null)
@@ -51,41 +51,90 @@ export default function ClientVerify() {
     }
 
 
-    // Fullscreen helpers
+    // Fullscreen helpers - Browser viewport fullscreen (not system fullscreen)
     const enterFullscreen = () => {
         const el = containerRef.current
-        if (el && el.requestFullscreen) {
-            el.requestFullscreen()
-        } else if (el && el.webkitRequestFullscreen) {
-            el.webkitRequestFullscreen()
-        } else if (el && el.msRequestFullscreen) {
-            el.msRequestFullscreen()
-        }
-    }
-    const exitFullscreen = () => {
-        if (document.exitFullscreen) {
-            document.exitFullscreen()
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen()
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen()
+        if (el) {
+            // Instead of native fullscreen, use CSS to make it fill browser viewport
+            setFullscreen(true)
+            if (onFullscreenChange) onFullscreenChange(true)
+
+            // Maintain stream when switching modes
+            if (videoRef.current && streaming) {
+                const currentStream = videoRef.current.srcObject
+                if (currentStream) {
+                    // Re-apply stream after DOM updates
+                    setTimeout(() => {
+                        if (videoRef.current) {
+                            videoRef.current.srcObject = currentStream
+                            videoRef.current.play().catch(err => console.log('Stream maintain error:', err))
+                        }
+                    }, 100)
+                }
+            }
         }
     }
 
-    // Listen for fullscreen changes
+    const exitFullscreen = () => {
+        setFullscreen(false)
+        if (onFullscreenChange) onFullscreenChange(false)
+
+        // Maintain stream when switching modes
+        if (videoRef.current && streaming) {
+            const currentStream = videoRef.current.srcObject
+            if (currentStream) {
+                // Re-apply stream after DOM updates
+                setTimeout(() => {
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = currentStream
+                        videoRef.current.play().catch(err => console.log('Stream maintain error:', err))
+                    }
+                }, 100)
+            }
+        }
+    }
+
+    // Listen for fullscreen changes and maintain stream
     useEffect(() => {
         const handleFs = () => {
-            setFullscreen(!!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement))
+            // No longer listening to native fullscreen events
+            // Fullscreen state is managed by React state only
+
+            // Maintain stream when switching modes
+            if (videoRef.current && streaming) {
+                const currentStream = videoRef.current.srcObject
+                if (currentStream) {
+                    // Re-apply stream after DOM updates
+                    setTimeout(() => {
+                        if (videoRef.current) {
+                            videoRef.current.srcObject = currentStream
+                            videoRef.current.play().catch(err => console.log('Stream maintain error:', err))
+                        }
+                    }, 100)
+                }
+            }
         }
+
+        // Handle keyboard escape key to exit fullscreen
+        const handleKeyPress = (event) => {
+            if (event.key === 'Escape' && fullscreen) {
+                exitFullscreen()
+            }
+        }
+
+        // If you still want to detect native fullscreen changes (optional)
         document.addEventListener('fullscreenchange', handleFs)
         document.addEventListener('webkitfullscreenchange', handleFs)
         document.addEventListener('msfullscreenchange', handleFs)
+        document.addEventListener('keydown', handleKeyPress)
+
         return () => {
             document.removeEventListener('fullscreenchange', handleFs)
             document.removeEventListener('webkitfullscreenchange', handleFs)
             document.removeEventListener('msfullscreenchange', handleFs)
+            document.removeEventListener('keydown', handleKeyPress)
         }
-    }, [])
+    }, [streaming, fullscreen])
 
     // Camera toggle
     const [cameraOn, setCameraOn] = useState(false)
@@ -342,7 +391,16 @@ export default function ClientVerify() {
     }, [])
 
     return (
-        <div ref={containerRef} className={fullscreen ? 'fixed inset-0 z-50 bg-black flex flex-col items-center justify-center w-full h-full' : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'} style={fullscreen ? { maxWidth: '100vw', maxHeight: '100vh' } : {}}>
+        <div
+            ref={containerRef}
+            className={fullscreen ? 'fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center w-screen h-screen' : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}
+            style={fullscreen
+                ? { width: '100vw', height: '100vh', top: 0, left: 0, position: 'fixed', marginTop: 0 }
+                : {}}
+        >
+            {fullscreen && (
+                <div style={{ width: '100vw', height: '32px', background: 'black', position: 'absolute', top: 0, left: 0, zIndex: 101 }} />
+            )}
             {/* Welcome Section (hide in fullscreen on all devices) */}
             {!fullscreen && (
                 <div className="text-center mb-4 sm:mb-8">
@@ -357,25 +415,27 @@ export default function ClientVerify() {
                 <div className={fullscreen ? 'flex flex-col items-center justify-center w-full h-full' : 'grid lg:grid-cols-2 gap-4 sm:gap-8'} style={fullscreen ? { flex: 1 } : {}}>
                     {/* Video Section */}
                     <div className={fullscreen ? 'flex-1 flex flex-col items-center justify-center w-full h-full' : 'space-y-2 sm:space-y-4'} style={fullscreen ? { minHeight: '0' } : {}}>
-                        <h3 className="mt-4 text-xl font-semibold text-white mb-2 sm:mb-4 flex items-center">
-                            <svg className="mt-1 w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Camera Feed
-                        </h3>
+                        {!fullscreen && (
+                            <h3 className="mt-4 text-xl font-semibold text-white mb-2 sm:mb-4 flex items-center">
+                                <svg className="mt-1 w-6 h-6 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Camera Feed
+                            </h3>
+                        )}
                         <div className={fullscreen ? 'relative w-full h-full flex-1 flex items-center justify-center' : 'relative'} style={fullscreen ? { minHeight: '0' } : {}}>
                             <video
                                 className={fullscreen ? `w-full h-full object-contain bg-black scale-x-[-1]` : `w-full aspect-video rounded-2xl bg-black/50 border border-white/10 scale-x-[-1]`}
                                 ref={videoRef}
                                 autoPlay
                                 playsInline
-                                style={fullscreen ? { borderRadius: 0, maxHeight: '100vh', maxWidth: '100vw' } : {}}
+                                style={fullscreen ? { borderRadius: 0, width: '100vw', height: '100vh', objectFit: 'contain' } : {}}
                             />
                             {/* Emotion Detection Overlay Canvas */}
                             <canvas
                                 ref={overlayCanvasRef}
                                 className={fullscreen ? `absolute top-0 left-0 w-full h-full object-contain pointer-events-none scale-x-[-1]` : `absolute top-0 left-0 w-full h-full pointer-events-none rounded-2xl scale-x-[-1]`}
-                                style={fullscreen ? { borderRadius: 0, maxHeight: '100vh', maxWidth: '100vw' } : {}}
+                                style={fullscreen ? { borderRadius: 0, width: '100vw', height: '100vh', objectFit: 'contain' } : {}}
                             />
                             {/* Status Indicator */}
                             {!fullscreen && (
@@ -565,7 +625,7 @@ export default function ClientVerify() {
                     )}
                     {/* Fullscreen Control Bar */}
                     {fullscreen && (
-                        <div className="fixed bottom-0 left-0 w-full z-50 bg-black/80 border-t border-white/10 flex flex-col items-center py-3 px-2" style={{ backdropFilter: 'blur(8px)' }}>
+                        <div className="fixed bottom-0 left-0 w-full z-[110] bg-black/80 border-t border-white/10 flex flex-col items-center py-3 px-2" style={{ backdropFilter: 'blur(8px)' }}>
                             <div className="flex flex-row items-center justify-center gap-3 w-full max-w-2xl">
                                 {/* Camera Toggle */}
                                 <button
