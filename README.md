@@ -450,7 +450,7 @@ const startEmotionDetection = async () => {
   - *Why*: Pre-trained models, multiple algorithms, easy integration
 
 - **MediaPipe 0.10.18**: Google's machine learning framework
-  - *Purpose*: Real-time perception tasks (face mesh, eye tracking)
+  - *Purpose*: Real-time perception tasks ( mesh, eye tracking)face
   - *Why*: Optimized for real-time processing, comprehensive face analysis
 
 - **OpenCV 4.12.0.88**: Computer vision library

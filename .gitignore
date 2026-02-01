@@ -2,3 +2,7 @@
 node_modules
 dist
 __pycache__
+
+
+# .venv\Scripts\activate
+# python main.py
